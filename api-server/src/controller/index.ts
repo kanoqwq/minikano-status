@@ -3,24 +3,13 @@ import { KanoStatus } from "../global"
 import Config from 'dotenv'
 const config = Config.config()
 
-const statusList: KanoStatus[] = [{
-    name: 'kano的手机',
-    type: 'phone',
-    lastUpdated: 1000000,
-    isOnline: true,
-    detail: {
-        isCharging: true,
-        battery: 100,
-        isScreenOn: true,
-        wifiStatus: 'connected',
-        currentPageTabTitle: '哔哩哔哩'
-    }
-}]
+const statusList: KanoStatus[] = []
 
 const getStatusList = async (ctx: RouterContext) => {
     ctx.body = {
         status: 0,
         message: '状态获取成功~',
+        length: statusList.length,
         list: statusList
     }
 }
