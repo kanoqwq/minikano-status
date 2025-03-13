@@ -21,9 +21,8 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn src/app.ts",
-    "resetFolder": "rimraf dist/*",
     "compile": "tsc",
-    "build": "npm-run-all resetFolder compile",
+    "build": "rm -rf ./dist && tsc",
     "start": "pm2 start ./dist/app.js"
   },
   "dependencies": {
