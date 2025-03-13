@@ -26,6 +26,8 @@
     "start": "pm2 start ./dist/app.js"
   },
   "dependencies": {
+    "@koa/cors": "^5.0.0",
+    "@types/koa__cors": "^5.0.0",
     "dotenv": "^16.0.3",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.4.1"

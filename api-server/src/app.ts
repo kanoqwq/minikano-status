@@ -2,10 +2,12 @@ import Koa from 'koa'
 import router from './router'
 import BodyParser from 'koa-bodyparser'
 import Config from 'dotenv'
+import cors from '@koa/cors'
 
 const config = Config.config()
 const app = new Koa()
 
+app.use(cors())
 app.use(BodyParser())
 app.use(async (ctx, next) => {
     if (ctx.method == "GET") return next()
