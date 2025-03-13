@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "CommonJS",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
+  },
+  "files": [
+    "./src/app.ts",
+    "./src/global.d.ts"
+  ],
+  "include": [
+    ".eslintrc.js",
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "public"
+  ]
+}

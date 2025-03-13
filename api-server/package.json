@@ -1,0 +1,34 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "author": "kanoqwq <1540508428@qq.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/koa": "^2.13.5",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-router": "^7.4.4",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "koa-router": "^12.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.3"
+  },
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/app.ts",
+    "resetFolder": "rimraf dist/*",
+    "compile": "tsc",
+    "build": "npm-run-all resetFolder compile",
+    "start": "pm2 start ./dist/app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.4.1"
+  }
+}
