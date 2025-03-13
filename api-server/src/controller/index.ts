@@ -40,12 +40,13 @@ const removeStatus = async (ctx: RouterContext) => {
 const receiveStatus = async (ctx: RouterContext) => {
     const status = ctx.request.body as KanoStatus[]
     if (status && status.length) {
+        let curTime = Date.now()
         let foundStatus = statusList.find(s => s.name === status[0].name)
         //if found
         if (foundStatus) {
-            statusList.splice(statusList.indexOf(foundStatus), 1, status[0])
+            statusList.splice(statusList.indexOf(foundStatus), 1, { ...status[0], lastUpdated: curTime })
         } else {
-            statusList.push(...status)
+            statusList.push({ ...status[0], lastUpdated: curTime })
         }
     }
     ctx.body = {
