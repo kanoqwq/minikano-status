@@ -1,2 +1,3 @@
 api-server/node_modules/
 api-server/.env
+.DS_Store
