@@ -1,7 +1,5 @@
 import { RouterContext } from "koa-router"
 import { KanoStatus } from "../global"
-import Config from 'dotenv'
-const config = Config.config()
 
 const statusList: KanoStatus[] = []
 
@@ -10,33 +8,36 @@ const getStatusList = async (ctx: RouterContext) => {
         status: 0,
         message: '状态获取成功~',
         length: statusList.length,
-        list: statusList
+        records: statusList
+    }
+}
+
+const removeStatus = async (ctx: RouterContext) => {
+    const param = ctx.params.name
+    if (!param) {
+        ctx.response.status = 404
+        return
+    }
+
+    const foundStatus = statusList.find(s => s.name === param)
+    if (!foundStatus) {
+        ctx.response.status = 404
+        return ctx.body = {
+            status: -1,
+            message: `云端没有找到叫做：'${param}'的状态哦~`,
+        }
+    }
+
+    statusList.splice(statusList.indexOf(foundStatus), 1)
+    ctx.body = {
+        status: 0,
+        message: '状态移除成功~',
+        length: statusList.length,
+        records: [foundStatus]
     }
 }
 
 const receiveStatus = async (ctx: RouterContext) => {
-    let token = config.parsed?.TOKEN
-    if (!token) {
-        ctx.response.status = 500
-        return ctx.body = {
-            status: -1,
-            error: '.env环境没找到token哦，快去添加token吧~'
-        }
-    }
-    if (!ctx.request.header.token) {
-        ctx.response.status = 404
-        return ctx.body = {
-            status: -2,
-            error: '你咋没带token呀，快去header里加上token吧~'
-        }
-    }
-    if (token !== ctx.request.header.token) {
-        ctx.response.status = 403
-        return ctx.body = {
-            status: -3,
-            error: 'token不对哦~'
-        }
-    }
     const status = ctx.request.body as KanoStatus[]
     if (status && status.length) {
         let foundStatus = statusList.find(s => s.name === status[0].name)
@@ -54,5 +55,5 @@ const receiveStatus = async (ctx: RouterContext) => {
 }
 
 export default {
-    getStatusList, receiveStatus
+    getStatusList, receiveStatus, removeStatus
 }
