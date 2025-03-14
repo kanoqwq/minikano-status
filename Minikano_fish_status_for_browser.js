@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      2025-03-13
 // @description  try to take over the world!
-// @author       You
+// @author       minikano
 // @match        *://*/*
 // @icon         https://api.kanokano.cn/lotw-status/favicon.ico
 // @grant        none
