@@ -35,7 +35,6 @@
             width: 100%;
             padding: 20px;
             border-radius: 16px;
-            background-color: #ffffff7b;
             backdrop-filter: blur(10px);
             box-shadow: #0000004b 0px 0px 10px 0px;
             margin: 0 20px;
@@ -48,12 +47,19 @@
 
         .deviceList li {
             border-radius: 10px;
+            background-color: #ffffff70;
+            backdrop-filter: blur(10px);
+            padding: 4px;
+            margin-bottom: 10px;
         }
 
-
         .deviceList li p {
-            overflow: auto;
             display: flex;
+            flex-wrap: wrap;
+            overflow: auto;
+            margin: 0;
+            padding: 10px 0;
+            padding-bottom: 5px;
             border-radius: 10px;
         }
 
@@ -64,6 +70,22 @@
             padding: 10px;
             background-color: rgba(255, 86, 2, 0.337);
             border-radius: 10px;
+        }
+
+        .deviceList strong {
+            width: fit-content;
+            box-sizing: border-box;
+            margin: 5px;
+            margin-top: 0;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .deviceList strong:hover,
+        .deviceList strong:active {
+            border: 1px solid pink;
+            box-shadow: 0 0 10px pink;
+            transform: scale(1.01);
         }
 
         .green {
@@ -80,16 +102,22 @@
             color: rgb(5, 200, 254);
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.918);
         }
+
+        .title {
+            margin-top: 0;
+            padding-left: 10px;
+            border-left: 6px solid skyblue;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="box" id="kano_box">
-            <h2>MiniKano の 当前状态:</h2>
+            <h2 class="title">MiniKano の 当前状态 🕛</h2>
             <p>设备列表：<strong></strong></p>
             <ul id="deviceList" class="deviceList">
-                <h3>Loading...</h3>
+                <h2 style="color: #333;margin:0">Loading...</h2>
             </ul>
         </div>
     </div>
@@ -101,31 +129,36 @@
                     console.log(data);
                     let listEl = document.querySelector('#deviceList')
                     if (data.status !== 0) {
-                        listEl.innerHTML = `<h3>数据获取失败</h3>`
+                        listEl.innerHTML = `<h3 style="color:#333;margin:0">数据获取失败</h3>`
                         return
                     }
 
-                    if (!data.records) {
-                        listEl.innerHTML = `<h3>没有数据哦~</h3>`
+                    if (!data.records || !data.records.length) {
+                        listEl.innerHTML = `<h3 style="color:#333;margin:0">没有数据哦~</h3>`
                         return
                     }
-
                     let html = ``
                     data.records.forEach((item) => {
                         let detail = item.detail
-                        html += `<li>`
+                        html += `<li style="padding-top: 15px;">`
                         detail && (html += `<p>
                             <strong>${item.name}</strong>
-                            <strong style="margin-left:10px" class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging ? '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}</strong>
-                            <strong style="margin-left:10px" class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>
-                            <strong style="margin-left:10px" class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>
-                            ${detail.cellularStatus ? `<strong style="margin-left:10px" class="green">网络状态：${detail.cellularStatus}</strong>` : ''}
+                            <strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging ? '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}</strong>
+                            <strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>
+                            <strong  class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>
+                            ${detail.cellularStatus ? `<strong  class="green">网络状态：${detail.cellularStatus}</strong>` : ''}
                             </p>`)
                         detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在浏览：${detail.currentPageTabTitle}</strong></p>`)
-
-                        html += `</li>`
+                        html += `<p style="color:#999;justify-content: end;margin:0 10px 0 0;padding:0;font-size:12px">更新时间：${(new Date(item.lastUpdated)).toLocaleString("zh-CN", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false // 24小时制
+                        })}</p > `
+                        html += `</li >`
                     })
-
                     listEl.innerHTML = html
                 });
         }
