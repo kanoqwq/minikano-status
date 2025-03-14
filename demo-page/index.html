@@ -163,6 +163,9 @@
                 });
         }
         getStatus()
+        setInterval(() => {
+            getStatus()
+        }, 60000);
     </script>
 </body>
 
