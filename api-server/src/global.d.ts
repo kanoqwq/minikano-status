@@ -5,7 +5,10 @@ export type KanoStatus = {
     lastUpdated: number,
     detail: {
         isCharging?: boolean,
+        chargingText?: string,
         battery?: number,
+        batteryCurrent?: number,
+        batteryTemperature?: number,
         isScreenOn?: boolean,
         wifiStatus?: 'connected' | 'disconnected',
         currentPageTabTitle?: string,

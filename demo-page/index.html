@@ -114,19 +114,19 @@
 <body>
     <div class="container">
         <div class="box" id="kano_box">
-            <h2 class="title">MiniKano の 当前状态 🕛</h2>
-            <p>设备列表：<strong></strong></p>
+            <h2 class="title">MiniKano の 摸鱼状态？ 🕛</h2>
+            <strong><i>摸鱼才是第一生产力！</i></strong>
+            <p>设备列表：</p>
             <ul id="deviceList" class="deviceList">
                 <h2 style="color: #333;margin:0">Loading...</h2>
             </ul>
         </div>
     </div>
     <script>
-        const getStatus = () => {
+        var getStatus = () => {
             fetch('https://api.kanokano.cn/status/')
                 .then((res) => res.json())
                 .then((data) => {
-                    console.log(data);
                     let listEl = document.querySelector('#deviceList')
                     if (data.status !== 0) {
                         listEl.innerHTML = `<h3 style="color:#333;margin:0">数据获取失败</h3>`
@@ -143,12 +143,12 @@
                         html += `<li style="padding-top: 15px;">`
                         detail && (html += `<p>
                             <strong>${item.name}</strong>
-                            <strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging ? '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}</strong>
+                            ${detail.isCharging !== null ? `<strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging == true ? detail.chargingText ? detail.chargingText :'充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}${detail.batteryCurrent ? ' 电池电流：' + detail.batteryCurrent + 'mA' : ''}${detail.batteryTemperature ? ' 电池温度：' + detail.batteryTemperature + '℃' : ''}</strong>` : ''}
                             <strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>
                             <strong  class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>
-                            ${detail.cellularStatus ? `<strong  class="green">网络状态：${detail.cellularStatus}</strong>` : ''}
+                            ${detail.cellularStatus ? `<strong  class="green">蜂窝状态：${detail.cellularStatus}</strong>` : ''}
                             </p>`)
-                        detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在浏览：${detail.currentPageTabTitle}</strong></p>`)
+                        detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在看：${detail.currentPageTabTitle}</strong></p>`)
                         html += `<p style="color:#999;justify-content: end;margin:0 10px 0 0;padding:0;font-size:12px">更新时间：${(new Date(item.lastUpdated)).toLocaleString("zh-CN", {
                             month: "2-digit",
                             day: "2-digit",
@@ -165,7 +165,7 @@
         getStatus()
         setInterval(() => {
             getStatus()
-        }, 60000);
+        }, 2000);
     </script>
 </body>
 
