@@ -12,7 +12,13 @@ const checkStatusList = () => {
         if (lastUpdated && !isNaN(lastUpdated)) {
             const isExpire = Math.floor((now - lastUpdated) / (60 * 60 * 1000)) >= 1 ? true : false
             if (isExpire) {
-                return { ...item, isOnline: false }
+                return {
+                    name: item.name,
+                    lastUpdated: item.lastUpdated,
+                    type: item.type,
+                    detail: {},
+                    isOnline: false
+                }
             }
             return item
         } else {
@@ -90,8 +96,8 @@ const getSMSList = async (ctx: RouterContext) => {
 
 //中兴F50专用(上传短信列表)
 const pushSMSList = async (ctx: RouterContext) => {
-    let sms = ctx.request.body as {messages:F50SMSItem[]}
-    if(sms && sms.messages && sms.messages.length){
+    let sms = ctx.request.body as { messages: F50SMSItem[] }
+    if (sms && sms.messages && sms.messages.length) {
         const sms_list = sms.messages
         smsList.length = 0
         smsList.push(...sms_list)
