@@ -30,6 +30,7 @@
     "@types/koa__cors": "^5.0.0",
     "dotenv": "^16.0.3",
     "koa": "^2.13.4",
-    "koa-bodyparser": "^4.4.1"
+    "koa-bodyparser": "^4.4.1",
+    "winston": "^3.17.0"
   }
 }

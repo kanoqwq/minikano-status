@@ -1,9 +1,30 @@
 import { RouterContext } from "koa-router"
-import { KanoStatus } from "../global"
+import { F50SMSItem, F50SMSItemList, KanoStatus } from "../global"
 
 const statusList: KanoStatus[] = []
+const smsList: F50SMSItemList = []
+
+//遍历并设置超过1小时没有更新的status为离线
+const checkStatusList = () => {
+    const newStatusList = statusList.map(item => {
+        const lastUpdated = Number(item.lastUpdated)
+        const now = Date.now()
+        if (lastUpdated && !isNaN(lastUpdated)) {
+            const isExpire = Math.floor((now - lastUpdated) / (60 * 60 * 1000)) >= 1 ? true : false
+            if (isExpire) {
+                return { ...item, isOnline: false }
+            }
+            return item
+        } else {
+            return item
+        }
+    })
+    statusList.length = 0
+    statusList.push(...newStatusList)
+}
 
 const getStatusList = async (ctx: RouterContext) => {
+    checkStatusList()
     ctx.body = {
         status: 0,
         message: '状态获取成功~',
@@ -38,7 +59,8 @@ const removeStatus = async (ctx: RouterContext) => {
 }
 
 const receiveStatus = async (ctx: RouterContext) => {
-    const status = ctx.request.body as KanoStatus[]
+    let status = ctx.request.body as KanoStatus[]
+    status = status.map(item => ({ ...item, isOnline: true }))
     if (status && status.length) {
         let curTime = Date.now()
         let foundStatus = statusList.find(s => s.name === status[0].name)
@@ -55,6 +77,31 @@ const receiveStatus = async (ctx: RouterContext) => {
     }
 }
 
+
+//中兴F50专用(获取短信列表)
+const getSMSList = async (ctx: RouterContext) => {
+    ctx.body = {
+        status: 0,
+        message: '短信获取成功~',
+        length: smsList.length,
+        records: smsList
+    }
+}
+
+//中兴F50专用(上传短信列表)
+const pushSMSList = async (ctx: RouterContext) => {
+    let sms = ctx.request.body as {messages:F50SMSItem[]}
+    if(sms && sms.messages && sms.messages.length){
+        const sms_list = sms.messages
+        smsList.length = 0
+        smsList.push(...sms_list)
+        ctx.body = {
+            status: 0,
+            message: '短信上传成功'
+        }
+    }
+}
+
 export default {
-    getStatusList, receiveStatus, removeStatus
+    getStatusList, receiveStatus, removeStatus, getSMSList, pushSMSList
 }
