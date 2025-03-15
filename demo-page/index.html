@@ -8,6 +8,7 @@
     <title>Minikano の 状态</title>
     <style>
         body {
+            position: relative;
             margin: 0;
             padding: 0;
             background-image: url('https://api.kanokano.cn/startThere/assets/bg.webp');
@@ -108,6 +109,19 @@
             padding-left: 10px;
             border-left: 6px solid skyblue;
         }
+
+        .footer {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            background-color: #ffffff79;
+        }
+        .footer p{
+            margin: 5px 15px;
+        }
     </style>
 </head>
 
@@ -121,6 +135,9 @@
                 <h2 style="color: #333;margin:0">Loading...</h2>
             </ul>
         </div>
+    </div>
+    <div class="footer">
+        <p>This page is created by <a href="https://github.com/kanoqwq">MiniKano</a> with love ❤️</p>
     </div>
     <script>
         function kano_getSignalEmoji(strength) {
