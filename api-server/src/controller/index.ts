@@ -1,5 +1,6 @@
 import { RouterContext } from "koa-router"
 import { F50SMSItem, F50SMSItemList, KanoStatus } from "../global"
+import { getF50DataOverFrp } from "../utils/F50_FRP"
 
 const statusList: KanoStatus[] = []
 const smsList: F50SMSItemList = []
@@ -31,6 +32,28 @@ const checkStatusList = () => {
 
 const getStatusList = async (ctx: RouterContext) => {
     checkStatusList()
+    //单独拿F50的状态（如果有）
+    const res = await getF50DataOverFrp()
+    if (res) {
+        const res_data = {
+            name: 'MiniKano 的 中兴F50 随身WIFI 🛜',
+            isOnline: true,
+            type: 'mifi',
+            lastUpdated: Date.now(),
+            detail: {
+                F50_config: res
+            }
+        }
+        if (!statusList.length)
+            statusList.unshift(res_data)
+        else {
+            const foundStatus = statusList.find(s => s.name?.includes('中兴F50'))
+            if (foundStatus)
+                statusList[statusList.indexOf(foundStatus)] = res_data
+            else
+                statusList.unshift(res_data)
+        }
+    }
     ctx.body = {
         status: 0,
         message: '状态获取成功~',
@@ -93,6 +116,16 @@ const getSMSList = async (ctx: RouterContext) => {
         records: smsList
     }
 }
+
+//中兴F50专用(获取短信列表 通过本地的内网穿透服务)
+// const getSMSListOverFrp = async (ctx: RouterContext) => {
+//     ctx.body = {
+//         status: 0,
+//         message: '短信获取成功~',
+//         length: smsList.length,
+//         records: smsList
+//     }
+// }
 
 //中兴F50专用(上传短信列表)
 const pushSMSList = async (ctx: RouterContext) => {

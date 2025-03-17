@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+
+<body>
+    <style>
+        ::-webkit-scrollbar {
+            width: 1px;
+            /* 纵向滚动条的宽度 */
+            height: 1px;
+            /* 横向滚动条的高度 */
+        }
+        /* 修改滚动条的宽度 */
+        .deviceList::-webkit-scrollbar {
+            width: 1px;
+            /* 纵向滚动条的宽度 */
+            height: 1px;
+            /* 横向滚动条的高度 */
+        }
+
+        .deviceList {
+            overflow: auto;
+            color: #fff;
+            padding: 0;
+            margin: 0;
+        }
+
+        .deviceList ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        .deviceList li {
+            list-style: none;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+
+        .deviceList li p {
+            display: flex;
+            flex-wrap: wrap;
+            overflow: auto;
+            margin: 0;
+            padding: 10px 0;
+            padding-bottom: 5px;
+            border-radius: 10px;
+        }
+
+        .deviceList strong {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            padding: 10px;
+            background-color: rgba(255, 86, 2, 0.337);
+            border-radius: 10px;
+        }
+
+        .deviceList strong {
+            width: fit-content;
+            box-sizing: border-box;
+            margin: 5px;
+            margin-top: 0;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .deviceList strong:hover,
+        .deviceList strong:active {
+            border: 1px solid pink;
+            box-shadow: 0 0 10px pink;
+            transform: scale(1.01);
+        }
+
+        .green {
+            color: rgba(40, 209, 40, 0.6);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.418);
+        }
+
+        .red {
+            color: rgba(202, 41, 41, 0.6);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.418);
+        }
+
+        .blue {
+            color: rgb(5, 200, 254);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.418);
+        }
+    </style>
+    <ul id="deviceList" class="deviceList">
+        <h2 style="color: #333;margin:0">Loading...</h2>
+    </ul>
+
+    <script>
+        function kano_getSignalEmoji(strength) {
+            const signals = ["📶 ⬜⬜⬜⬜", "📶 🟨⬜⬜⬜", "📶 🟩🟨⬜⬜", "📶 🟩🟩🟨⬜", "📶 🟩🟩🟩🟨", "📶 🟩🟩🟩🟩"];
+            return signals[Math.max(0, Math.min(strength, 5))]; // 确保输入在 0-5 之间
+        }
+        function kano_formatTime(seconds) {
+            if (seconds < 60) {
+                return `${seconds} 秒`;
+            } else if (seconds < 3600) {
+                return `${(seconds / 60).toFixed(1)} 分钟`;
+            } else {
+                return `${(seconds / 3600).toFixed(1)} 小时`;
+            }
+        }
+        function requestInterval(callback, interval) {
+            let lastTime = 0;
+            let timeoutId = null;
+
+            function loop(timestamp) {
+                if (!lastTime) lastTime = timestamp; // 初始化上次时间
+                const delta = timestamp - lastTime; // 计算时间差
+
+                if (delta >= interval) {
+                    callback(); // 执行任务
+                    lastTime = timestamp; // 更新上次时间
+                }
+
+                timeoutId = requestAnimationFrame(loop); // 继续请求下一帧
+            }
+
+            timeoutId = requestAnimationFrame(loop); // 启动动画循环
+
+            // 返回清除函数
+            return () => cancelAnimationFrame(timeoutId);
+        }
+        var getStatus = () => {
+            fetch('https://api.kanokano.cn/status/')
+                .then((res) => res.json())
+                .then((data) => {
+                    let listEl = document.querySelector('#deviceList')
+                    if (data.status !== 0) {
+                        listEl.innerHTML = `<h3 style="color:#333;margin:0">数据获取失败</h3>`
+                        return
+                    }
+
+                    if (!data.records || !data.records.length) {
+                        listEl.innerHTML = `<h3 style="color:#333;margin:0">没有数据哦~</h3>`
+                        return
+                    }
+                    let html = ``
+                    data.records.forEach((item) => {
+                        let detail = item.detail
+                        html += `<li style="padding-top: 15px;">`
+                        detail && (html += `<p>
+                                <strong><span class="${item.isOnline ? 'green' : 'red'}">${item.isOnline ? '[在线]&nbsp;' : '[离线]&nbsp;'}</span>${item.name}</strong>
+                                ${((detail.isCharging !== undefined) && (detail.isCharging !== null)) ? `<strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging == true ? detail.chargingText ? detail.chargingText : '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}${detail.batteryCurrent ? ' 电池电流：' + detail.batteryCurrent + 'mA' : ''}${detail.batteryTemperature ? ' 电池温度：' + detail.batteryTemperature + '℃' : ''}</strong>` : ''}
+                                ${((detail.isScreenOn !== undefined) && (detail.isScreenOn !== null)) ? `<strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>` : ''}
+                                ${((detail.wifiStatus !== undefined) && (detail.wifiStatus !== null)) ? `<strong  class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>` : ''}
+                                ${detail.cellularStatus ? `<strong  class="green">蜂窝状态：${detail.cellularStatus}</strong>` : ''}
+    
+                                ${detail.F50_data ? (`
+                                    ${detail.F50_data.network_type ? `<strong  class="green">蜂窝状态：${detail.F50_data.network_provider} ${detail.F50_data.network_type}</strong>` : ''}
+                                    ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue">设备数：${detail.F50_data.wifi_access_sta_num}</strong>` : ''}
+                                    ${detail.F50_data.rssi ? `<strong  class="green">蜂窝信号强度：${kano_getSignalEmoji(detail.F50_data.rssi)}</strong>` : ''}
+                                    ${detail.F50_data.realtime_time ? `<strong  class="blue">连接时长：${kano_formatTime(Number(detail.F50_data.realtime_time))}${detail.F50_data.monthly_time ? '&nbsp;<span style="color:white">/</span>&nbsp;总时长(月): ' + kano_formatTime(Number(detail.F50_data.monthly_time)) : ''}</strong>` : ''}
+                                    ${(detail.F50_data.monthly_tx_bytes && detail.F50_data.monthly_rx_bytes) ? `<strong  class="blue">已用流量：<span class="red">${Number((detail.F50_data.monthly_tx_bytes + detail.F50_data.monthly_rx_bytes) / 1024 / 1024 / 1024).toFixed(2)} GB</span>${detail.F50_data.data_volume_limit_size ? '&nbsp;<span style="color:white">/</span>&nbsp;总流量：' + detail.F50_data.data_volume_limit_size.split('_')[0] + ' GB' : ''}</strong>` : ''}
+                                `) : ''}
+                            </p>`)
+
+                        detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在看：${detail.currentPageTabTitle}</strong></p>`)
+                        html += `<p style="color:#999;justify-content: end;margin:0 10px 0 0;padding:0;font-size:12px">更新时间：${(new Date(item.lastUpdated)).toLocaleString("zh-CN", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false // 24小时制
+                        })}</p > `
+                        html += `</li >`
+                    })
+                    listEl.innerHTML = html
+                });
+        }
+        getStatus()
+        requestInterval(() => {
+            getStatus()
+        }, 2000)
+    </script>
+</body>
+
+</html>
