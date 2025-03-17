@@ -10,7 +10,7 @@ const getData = async () => {
         const cmd = 'rssi,Z5g_rsrp,wifi_access_sta_num,loginfo,data_volume_alert_percent,data_volume_limit_size,realtime_rx_thrpt,realtime_tx_thrpt,realtime_time,monthly_tx_bytes,monthly_rx_bytes,monthly_time,network_type,network_provider'
         const res = await fetch("http://" + baseURL + "/goform/goform_get_cmd_process?multi_data=1&isTest=false&cmd=" + cmd + "&" + params, {
             headers: {
-                "referer": 'http://' + baseURL + '/',
+                "referer": 'http://192.168.0.11/',
                 "host": '192.168.0.1'
             }
         })

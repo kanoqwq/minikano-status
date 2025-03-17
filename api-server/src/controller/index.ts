@@ -34,7 +34,7 @@ const getStatusList = async (ctx: RouterContext) => {
     checkStatusList()
     //单独拿F50的状态（如果有）
     const res = await getF50DataOverFrp()
-    if (res) {
+    if (res && !res.Error) {
         const res_data = {
             name: 'MiniKano 的 中兴F50 随身WIFI 🛜',
             isOnline: true,
