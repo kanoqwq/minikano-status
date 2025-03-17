@@ -1,6 +1,6 @@
 import { RouterContext } from "koa-router"
 import { F50SMSItem, F50SMSItemList, KanoStatus } from "../global"
-import { getF50DataOverFrp } from "../utils/F50_FRP"
+import { getF50DataOverFrp, getSmsInfoOverFrp } from "../utils/F50_FRP"
 
 const statusList: KanoStatus[] = []
 const smsList: F50SMSItemList = []
@@ -118,14 +118,15 @@ const getSMSList = async (ctx: RouterContext) => {
 }
 
 //中兴F50专用(获取短信列表 通过本地的内网穿透服务)
-// const getSMSListOverFrp = async (ctx: RouterContext) => {
-//     ctx.body = {
-//         status: 0,
-//         message: '短信获取成功~',
-//         length: smsList.length,
-//         records: smsList
-//     }
-// }
+const getSMSListOverFrp = async (ctx: RouterContext) => {
+    const res = await getSmsInfoOverFrp()
+    return ctx.body = {
+        status: 0,
+        message: '短信获取成功~',
+        length: res.messages.length || 0,
+        records: res.messages || []
+    }
+}
 
 //中兴F50专用(上传短信列表)
 const pushSMSList = async (ctx: RouterContext) => {
@@ -142,5 +143,5 @@ const pushSMSList = async (ctx: RouterContext) => {
 }
 
 export default {
-    getStatusList, receiveStatus, removeStatus, getSMSList, pushSMSList
+    getStatusList, receiveStatus, removeStatus, getSMSList, pushSMSList, getSMSListOverFrp
 }

@@ -19,7 +19,12 @@ export const logger = winston.createLogger({
         })
     ),
     transports: [
-        new winston.transports.File({ filename: path.join(logDir, "log.txt") }),
+        new winston.transports.File({
+            filename: path.join(logDir, "log.txt"),
+            maxsize: 10 * 1024 * 1024,  // 最大日志文件大小：10MB
+            maxFiles: 5,  // 保留的最大日志文件数量
+            tailable: true,  // 如果设置为 true，将始终将日志写入最新文件
+        }),
     ],
 });
 

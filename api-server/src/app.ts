@@ -3,22 +3,24 @@ import router from './router'
 import BodyParser from 'koa-bodyparser'
 import Config from 'dotenv'
 import cors from '@koa/cors'
-// import { logger } from './utils/logger'
+import { logger } from './utils/logger'
 
 const config = Config.config()
 const app = new Koa()
 
 // 中间件记录请求日志
-// app.use(async (ctx, next) => {
-//     const start = Date.now();
-//     await next();
-//     const ms = Date.now() - start;
-//     const logMessage = `${ctx.method} ${ctx.url} ${JSON.stringify(ctx.request.body || {})} ${ctx.status} - ${ms}ms`;
-//     logger.info(logMessage);
-// });
+app.use(async (ctx, next) => {
+    const start = Date.now();
+    await next();
+    const ms = Date.now() - start;
+    const logMessage = `${ctx.method} ${ctx.url} - ${ms}ms`;
+    logger.info(logMessage);
+});
 
 app.use(cors())
 app.use(BodyParser())
+app.use(router.routes())
+
 app.use(async (ctx, next) => {
     if (ctx.method == "GET" && !ctx.path.includes('/sms')) return next()
 
@@ -47,7 +49,6 @@ app.use(async (ctx, next) => {
     }
     next()
 })
-app.use(router.routes())
 
 app.listen(3000)
 console.log('Server running on http://localhost:3000');

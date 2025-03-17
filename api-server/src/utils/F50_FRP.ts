@@ -21,6 +21,25 @@ const getData = async () => {
         return null
     }
 }
+
+//获取短信列表（base64编码）
+export const getSmsInfoOverFrp = async () => {
+    // try {
+        const params = new URLSearchParams()
+        params.append('_', Date.now().toString())
+        const res = await fetch("http://" + baseURL + "/goform/goform_get_cmd_process?multi_data=1&isTest=false&cmd=sms_data_total&page=0&data_per_page=500&mem_store=1&tags=100&order_by=order by id desc&" + params, {
+            headers: {
+                "referer": 'http://192.168.0.11/',
+                "host": '192.168.0.1'
+            }
+        })
+        return await res.json()
+    // } catch {
+        // return null
+    // }
+}
+
+
 let data: any = {}
 let timer: any = null
 let timing = false // 默认值为false，避免初始时直接触发
