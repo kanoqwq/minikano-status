@@ -21,8 +21,24 @@ const getData = async () => {
         return null
     }
 }
+let data: any = {}
+let timer: any = null
+let timing = false // 默认值为false，避免初始时直接触发
 
 export const getF50DataOverFrp = async () => {
-    // 'MiniKano 的 中兴F50 随身WIFI 🛜'
-    return await getData()
+    if (timing) {
+        return data; // 如果正在计时，直接返回当前数据
+    }
+
+    clearTimeout(timer);
+
+    timing = true;
+
+    data = await getData();
+
+    timer = setTimeout(() => {
+        timing = false;
+    }, 2000);
+
+    return data;
 }
