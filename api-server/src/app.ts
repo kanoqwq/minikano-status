@@ -18,9 +18,6 @@ app.use(async (ctx, next) => {
 });
 
 app.use(cors())
-app.use(BodyParser())
-app.use(router.routes())
-
 app.use(async (ctx, next) => {
     if (ctx.method == "GET" && !ctx.path.includes('/sms')) return next()
 
@@ -47,8 +44,11 @@ app.use(async (ctx, next) => {
             error: 'token不对哦~'
         }
     }
-    next()
+    return next()
 })
+
+app.use(BodyParser())
+app.use(router.routes())
 
 app.listen(3000)
 console.log('Server running on http://localhost:3000');
