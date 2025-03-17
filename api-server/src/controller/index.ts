@@ -41,7 +41,7 @@ const getStatusList = async (ctx: RouterContext) => {
             type: 'mifi',
             lastUpdated: Date.now(),
             detail: {
-                F50_config: res
+                F50_data: res
             }
         }
         if (!statusList.length)

@@ -13,7 +13,7 @@ export type KanoStatus = {
         wifiStatus?: 'connected' | 'disconnected',
         currentPageTabTitle?: string,
         cellularStatus?: '4G' | '5G' | '3G',
-        F50_config?: {
+        F50_data?: {
             "network_type": string,
             "network_provider": string,
             "wifi_access_sta_num": string,
