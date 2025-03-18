@@ -205,7 +205,7 @@
             <p>请输入请求token：</p>
             <input id="tokenInput" type="text" style="margin-bottom: 20px;">
         </div>
-        <div class="btn">
+        <div class="btn" style="text-align: right;">
             <button onclick="onTokenConfirm()">确认</button>
             <button onclick="closeModal('#tokenModal')">取消</button>
         </div>
@@ -355,6 +355,7 @@
                 if (res_data && res_data.status !== 0) {
                     localStorage.removeItem('kano_sms_token')
                     showModal('#tokenModal')
+                    createToast(res_data.error, 'red')
                     return null
                 }
                 return res_data
@@ -362,6 +363,32 @@
                 localStorage.removeItem('kano_sms_token')
                 showModal('#tokenModal')
                 return null
+            }
+        }
+        let handleSmsRender = async () => {
+            let list = document.querySelector('#sms-list')
+            if (!list) createToast('没有找到短信列表节点', 'red')
+            list.innerHTML = ` <li><h2 style="padding: 30px;">Loading...</h2></li>`
+            showModal('#smsList')
+            let res = await getSms()
+            if (res && res.records) {
+                const dateStrArr = ['年', '月', '日', ':', ':', '']
+                list.innerHTML = res.records.map(item => {
+                    let date = item.date.split(',')
+                    date.pop()
+                    date = date.map((item, index) => {
+                        return item + dateStrArr[index]
+                    }).join('')
+                    return `<li class="sms-item">
+                                            <p style="color:purple;font-size:16px;margin:4px 0">${item.number}</p>
+                                            <p>${decodeBase64(item.content)}</p>
+                                            <p style="text-align:right;color:purple;margin-top:4px">${date}</p >
+                                        </li > `
+                }).join('')
+            } else {
+                if (!res) return closeModal('#smsList')
+                list.innerHTML = ` <li> <h2 style="padding: 30px;">没有短信</h2></li >`
+                createToast('没有短信', 'red')
             }
         }
         var getStatus = () => {
@@ -416,29 +443,7 @@
                         if (!localStorage.getItem('kano_sms_token')) {
                             showModal('#tokenModal')
                         } else {
-                            let list = document.querySelector('#sms-list')
-                            if (!list) createToast('没有找到短信列表节点', 'red')
-                            list.innerHTML = ` <li><h2 style="padding: 30px;">Loading...</h2></li>`
-                            showModal('#smsList')
-                            let res = await getSms()
-                            if (res && res.records) {
-                                const dateStrArr = ['年', '月', '日', ':', ':', '']
-                                list.innerHTML = res.records.map(item => {
-                                    let date = item.date.split(',')
-                                    date.pop()
-                                    date = date.map((item, index) => {
-                                        return item + dateStrArr[index]
-                                    }).join('')
-                                    return `<li class="sms-item">
-                                            <p style="color:purple;font-size:16px;margin:4px 0">${item.number}</p>
-                                            <p>${decodeBase64(item.content)}</p>
-                                            <p style="text-align:right;color:purple;margin-top:4px">${date}</p >
-                                        </li > `
-                                }).join('')
-                            } else {
-                                list.innerHTML = ` < li > <h2 style="padding: 30px;">没有短信</h2></li >`
-                                createToast('没有短信', 'red')
-                            }
+                            handleSmsRender()
                         }
                     })
                 });
