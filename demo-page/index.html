@@ -125,6 +125,63 @@
             margin: 0;
             padding: 5px 15px;
         }
+
+        .modal {
+            position: fixed;
+            overflow: hidden;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff82;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 10px;
+            opacity: 1;
+            transition: all .3s;
+        }
+
+        .modal button {
+            padding: 2px 8px;
+            background-color: skyblue;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            color: white;
+            transition: box-shadow .2s;
+        }
+
+        .modal button:hover {
+            box-shadow: 0 0 10px 0 skyblue
+        }
+
+        .modal button:active {
+            border: 1px solid pink;
+        }
+
+        .modal input {
+            border-radius: 6px;
+            border: 1px solid skyblue;
+        }
+
+        .modal .content {
+            overflow: auto;
+            max-height: 300px;
+        }
+
+        .sms-item {
+            max-width: 500px;
+            overflow: auto;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 10px;
+            background: #ffffff70;
+            font-size: 14px;
+        }
+
+        .sms-item p {
+            margin: 0;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 
@@ -142,7 +199,102 @@
     <div class="footer">
         <p>This page is created by <a href="https://github.com/kanoqwq">MiniKano</a> with love ❤️</p>
     </div>
+    <div class="modal" id="tokenModal" style="display: none;">
+        <div class="title">提示</div>
+        <div class="content">
+            <p>请输入请求token：</p>
+            <input id="tokenInput" type="text" style="margin-bottom: 20px;">
+        </div>
+        <div class="btn">
+            <button onclick="onTokenConfirm()">确认</button>
+            <button onclick="closeModal('#tokenModal')">取消</button>
+        </div>
+    </div>
+    <div class="modal" id="smsList" style="display: none;">
+        <div class="title">短信列表</div>
+        <div class="content">
+            <ul id="sms-list">
+            </ul>
+        </div>
+        <div class="btn" style="text-align: right;margin-top: 10px;">
+            <button onclick="closeModal('#smsList')">关闭</button>
+        </div>
+    </div>
     <script>
+        function decodeBase64(base64String) {
+            // 将Base64字符串分成每64个字符一组
+            const padding = base64String.length % 4 === 0 ? 0 : 4 - (base64String.length % 4)
+            base64String += '='.repeat(padding)
+
+            // 使用atob()函数解码Base64字符串
+            const binaryString = window.atob(base64String)
+
+            // 将二进制字符串转换为TypedArray
+            const bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i)
+
+            // 将TypedArray转换为字符串
+            return new TextDecoder('utf-8').decode(bytes)
+        }
+
+        function createToast(text, color, delay = 3000) {
+            const toastEl = document.createElement('div')
+            toastEl.style.position = 'fixed'
+            toastEl.style.padding = '10px'
+            toastEl.style.top = '20px'
+            toastEl.style.right = '20px'
+            toastEl.style.color = color || 'while'
+            toastEl.style.backgroundColor = '#ffffff54'
+            toastEl.style.transition = `opacity .2s`
+            toastEl.style.opacity = `0`
+            toastEl.style.backdropFilter = 'blur(10px)'
+            toastEl.style.borderRadius = '6px'
+            toastEl.innerHTML = text;
+            const id = 'toastkano'
+            toastEl.setAttribute('class', id);
+            const toasts = document.querySelectorAll('.toastkano')
+            document.body.appendChild(toastEl)
+            setTimeout(() => {
+                toastEl.style.opacity = `1`
+            }, 0);
+            if (toasts.length) {
+                const top = toasts[toasts.length - 1].getBoundingClientRect().top
+                const height = toastEl.getBoundingClientRect().height
+                toastEl.style.top = top + height + 10 + 'px'
+            }
+            let timer = null
+            setTimeout(() => {
+                toastEl.style.opacity = `0`
+                clearTimeout(timer)
+                timer = setTimeout(() => {
+                    document.body.removeChild(toastEl)
+                }, 200);
+            }, delay);
+        }
+        function closeModal(txt, time = 300) {
+            let el = document.querySelector(txt)
+            if (!el) return
+            el.style.opacity = 0
+            setTimeout(() => {
+                el.style.display = 'none'
+            }, time)
+        }
+        function showModal(txt, time = 300) {
+            let el = document.querySelector(txt)
+            if (!el) return
+            el.style.opacity = 0
+            el.style.display = 'block'
+            setTimeout(() => {
+                el.style.opacity = 1
+            }, 10)
+        }
+        function onTokenConfirm() {
+            let tkInput = document.querySelector('#tokenInput')
+            let token = tkInput && (tkInput.value)
+            if (!token || !token?.trim()) return createToast('没有token', 'red')
+            localStorage.setItem('kano_sms_token', token.trim())
+            closeModal('#tokenModal')
+        }
         function kano_getSignalEmoji(strength) {
             const signals = ["📶 ⬜⬜⬜⬜", "📶 🟨⬜⬜⬜", "📶 🟩🟨⬜⬜", "📶 🟩🟩🟨⬜", "📶 🟩🟩🟩🟨", "📶 🟩🟩🟩🟩"];
             return signals[Math.max(0, Math.min(strength, 5))]; // 确保输入在 0-5 之间
@@ -184,6 +336,34 @@
             const i = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
         }
+        var getSms = async () => {
+            const TOKEN = localStorage.getItem('kano_sms_token')
+            if (!TOKEN) {
+                localStorage.removeItem('kano_sms_token')
+                showModal('#tokenModal')
+                return null
+            }
+
+            try {
+                let res = await fetch('https://api.kanokano.cn/sms/', {
+                    headers: {
+                        token: TOKEN
+                    }
+                })
+                let res_data = await res.json()
+
+                if (res_data && res_data.status !== 0) {
+                    localStorage.removeItem('kano_sms_token')
+                    showModal('#tokenModal')
+                    return null
+                }
+                return res_data
+            } catch {
+                localStorage.removeItem('kano_sms_token')
+                showModal('#tokenModal')
+                return null
+            }
+        }
         var getStatus = () => {
             fetch('https://api.kanokano.cn/status/')
                 .then((res) => res.json())
@@ -202,7 +382,7 @@
                     data.records.forEach((item) => {
                         let detail = item.detail
                         html += `<li style="padding-top: 15px;">`
-                        detail && (html += `<p>
+                        detail ? (html += `<p>
                             <strong><span class="${item.isOnline ? 'green' : 'red'}">${item.isOnline ? '[在线]&nbsp;' : '[离线]&nbsp;'}</span>${item.name}</strong>
                             ${((detail.isCharging !== undefined) && (detail.isCharging !== null)) ? `<strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging == true ? detail.chargingText ? detail.chargingText : '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}${detail.batteryCurrent ? ' 电池电流：' + detail.batteryCurrent + 'mA' : ''}${detail.batteryTemperature ? ' 电池温度：' + detail.batteryTemperature + '℃' : ''}</strong>` : ''}
                             ${((detail.isScreenOn !== undefined) && (detail.isScreenOn !== null)) ? `<strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>` : ''}
@@ -216,9 +396,9 @@
                                 ${detail.F50_data.realtime_time ? `<strong  class="blue">连接时长：${kano_formatTime(Number(detail.F50_data.realtime_time))}${detail.F50_data.monthly_time ? '&nbsp;<span style="color:white">/</span>&nbsp;总时长(月): ' + kano_formatTime(Number(detail.F50_data.monthly_time)) : ''}</strong>` : ''}
                                 ${detail.F50_data.realtime_tx_thrpt != undefined && detail.F50_data.realtime_rx_thrpt != undefined ? `<strong  class="blue">当前网速: ⬇️ ${formatBytes(Number((detail.F50_data.realtime_rx_thrpt)))}/S ⬆️ ${formatBytes(Number((detail.F50_data.realtime_tx_thrpt)))}/S</strong>` : ''}
                                 ${(detail.F50_data.monthly_tx_bytes && detail.F50_data.monthly_rx_bytes) ? `<strong  class="blue">已用流量：<span class="red">${Number((detail.F50_data.monthly_tx_bytes + detail.F50_data.monthly_rx_bytes) / 1024 / 1024 / 1024).toFixed(2)} GB</span>${detail.F50_data.data_volume_limit_size ? '&nbsp;<span style="color:white">/</span>&nbsp;总流量：' + detail.F50_data.data_volume_limit_size.split('_')[0] + ' GB' : ''}</strong>` : ''}
+                                ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue" id="smsBtn" style="border:1px solid skyblue">查看短信</strong>` : ''}
                             `) : ''}
-                        </p>`)
-
+                        </p>`) : '';
                         detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在看：${detail.currentPageTabTitle}</strong></p>`)
                         html += `<p style="color:#999;justify-content: end;margin:0 10px 0 0;padding:0;font-size:12px">更新时间：${(new Date(item.lastUpdated)).toLocaleString("zh-CN", {
                             month: "2-digit",
@@ -231,6 +411,36 @@
                         html += `</li >`
                     })
                     listEl.innerHTML = html
+                    var smsBtn = document.querySelector('#smsBtn')
+                    smsBtn && (smsBtn.onclick = async () => {
+                        if (!localStorage.getItem('kano_sms_token')) {
+                            showModal('#tokenModal')
+                        } else {
+                            let list = document.querySelector('#sms-list')
+                            if (!list) createToast('没有找到短信列表节点', 'red')
+                            list.innerHTML = ` <li><h2 style="padding: 30px;">Loading...</h2></li>`
+                            showModal('#smsList')
+                            let res = await getSms()
+                            if (res && res.records) {
+                                const dateStrArr = ['年', '月', '日', ':', ':', '']
+                                list.innerHTML = res.records.map(item => {
+                                    let date = item.date.split(',')
+                                    date.pop()
+                                    date = date.map((item, index) => {
+                                        return item + dateStrArr[index]
+                                    }).join('')
+                                    return `<li class="sms-item">
+                                            <p style="color:purple;font-size:16px;margin:4px 0">${item.number}</p>
+                                            <p>${decodeBase64(item.content)}</p>
+                                            <p style="text-align:right;color:purple;margin-top:4px">${date}</p >
+                                        </li > `
+                                }).join('')
+                            } else {
+                                list.innerHTML = ` < li > <h2 style="padding: 30px;">没有短信</h2></li >`
+                                createToast('没有短信', 'red')
+                            }
+                        }
+                    })
                 });
         }
         getStatus()
