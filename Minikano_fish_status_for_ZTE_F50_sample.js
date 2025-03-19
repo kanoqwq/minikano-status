@@ -1,7 +1,7 @@
 
 
 //注意，如果是在f50本机内发起请求，请将请求端口更改为8080
-const baseURL = '[240e:828:0:d6ce:1c01:85ff:fe61:75e]:8080'
+const baseURL = '[？]:8080'
 //获取基本数据
 const getData = () => {
     const params = new URLSearchParams()

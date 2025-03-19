@@ -172,11 +172,17 @@
 
         .modal .action {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            margin-top: 10px;
             background-color: #00ffdd7c;
             padding: 5px 6px;
             border-radius: 6px;
+        }
+
+        .modal .action input {
+            height: 30px;
+            padding: 5px;
+            box-sizing: border-box;
         }
 
         .sms-item {
@@ -240,14 +246,18 @@
     </div>
     <div class="modal" id="smsList" style="display: none;">
         <div class="title" style="margin-bottom: 6px;">短信列表</div>
-        <div class="content">
+        <div class="action" style="margin-top: 10px;background-color: #00ffdd17;box-shadow: 0 0 10px 0 #00ffdd96;">
+            <span>收件人：</span>
+            <input id="PhoneInput" type="number" style="flex: 1;margin-right: 6px"></input>
+        </div>
+        <div class="content" id="content">
             <ul id="sms-list">
             </ul>
         </div>
         <div class="action" style="background-color: #00ffdd17;box-shadow: 0 0 10px 0 #00ffdd96;">
-            <input type="text" style="flex: 1;margin-right: 6px"></input>
+            <input id="SMSInput" type="text" style="flex: 1;margin-right: 6px"></input>
             <div class="btn">
-                <button onclick="closeModal('#smsList')">发送</button>
+                <button onclick="sendSMS()">发送</button>
                 <button onclick="closeModal('#smsList')">关闭</button>
             </div>
         </div>
@@ -275,11 +285,14 @@
             toastEl.style.position = 'fixed'
             toastEl.style.padding = '10px'
             toastEl.style.top = '20px'
-            toastEl.style.right = '20px'
+            toastEl.style.right = '50%'
+            toastEl.style.transform = 'translateX(50%)'
             toastEl.style.color = color || 'while'
             toastEl.style.backgroundColor = '#ffffff54'
             toastEl.style.transition = `opacity .2s`
             toastEl.style.opacity = `0`
+            toastEl.style.boxShadow = '0 0 10px 0 #00ffdd96'
+            toastEl.style.fontWeight = 'bold'
             toastEl.style.backdropFilter = 'blur(10px)'
             toastEl.style.borderRadius = '6px'
             toastEl.innerHTML = text;
@@ -398,10 +411,43 @@
                 return null
             }
         }
+        let isDisabledSendSMS = false
+        var sendSMS = async () => {
+            const SMSInput = document.querySelector('#SMSInput')
+            const PhoneInput = document.querySelector('#PhoneInput')
+            if (SMSInput && SMSInput.value && SMSInput.value.trim()
+                && PhoneInput && PhoneInput.value && Number(PhoneInput.value.trim())
+            ) {
+                const content = SMSInput.value.trim()
+                const number = PhoneInput.value.trim()
+                isDisabledSendSMS = true
+                const res = await fetch('https://api.kanokano.cn/sms/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        token: localStorage.getItem('kano_sms_token')
+                    },
+                    body: JSON.stringify({
+                        content, number
+                    })
+                })
+                const res_data = await res.json()
+                if (res_data && res_data.status == 0) {
+                    SMSInput.value = ''
+                    createToast('发送成功！', 'green')
+                    handleSmsRender()
+                } else {
+                    createToast((res_data && res_data.message) ? res_data.message : '发送失败', 'red')
+                }
+                isDisabledSendSMS = false
+            } else {
+                createToast('请输入手机号和内容', 'red')
+            }
+        }
         let handleSmsRender = async () => {
             let list = document.querySelector('#sms-list')
             if (!list) createToast('没有找到短信列表节点', 'red')
-            list.innerHTML = ` <li><h2 style="padding: 30px;">Loading...</h2></li>`
+            list.innerHTML = ` <li><h2 style="padding: 30px;text-align:center">Loading...</h2></li>`
             showModal('#smsList')
             let res = await getSms()
             if (res && res.records) {
@@ -457,7 +503,7 @@
                                 ${detail.F50_data.realtime_time ? `<strong  class="blue">连接时长：${kano_formatTime(Number(detail.F50_data.realtime_time))}${detail.F50_data.monthly_time ? '&nbsp;<span style="color:white">/</span>&nbsp;总时长(月): ' + kano_formatTime(Number(detail.F50_data.monthly_time)) : ''}</strong>` : ''}
                                 ${detail.F50_data.realtime_tx_thrpt != undefined && detail.F50_data.realtime_rx_thrpt != undefined ? `<strong  class="blue">当前网速: ⬇️ ${formatBytes(Number((detail.F50_data.realtime_rx_thrpt)))}/S ⬆️ ${formatBytes(Number((detail.F50_data.realtime_tx_thrpt)))}/S</strong>` : ''}
                                 ${(detail.F50_data.monthly_tx_bytes && detail.F50_data.monthly_rx_bytes) ? `<strong  class="blue">已用流量：<span class="red">${Number((detail.F50_data.monthly_tx_bytes + detail.F50_data.monthly_rx_bytes) / 1024 / 1024 / 1024).toFixed(2)} GB</span>${detail.F50_data.data_volume_limit_size ? '&nbsp;<span style="color:white">/</span>&nbsp;总流量：' + detail.F50_data.data_volume_limit_size.split('_')[0] + ' GB' : ''}</strong>` : ''}
-                                ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue" id="smsBtn" style="border:1px solid skyblue">查看短信</strong>` : ''}
+                                ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue" id="smsBtn" style="border:1px solid skyblue">短信收发</strong>` : ''}
                             `) : ''}
                         </p>`) : '';
                         detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在看：${detail.currentPageTabTitle}</strong></p>`)
