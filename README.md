@@ -2,7 +2,7 @@
 
 >如果想做单独的短信收发功能，请使用`demopage/sms-send.html` 并配置好后端服务
 
-![](./img\1.png)
+![](./img/1.png)
 
 ![](./img/2.png)
 
