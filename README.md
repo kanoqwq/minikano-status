@@ -1,3 +1,7 @@
+## 关于中兴F50的短信收发功能
+
+>如果想做单独的短信收发功能，请使用`demopage/sms-send.html` 并配置好后端服务
+
 ## 功能
 
 >查看本人所使用的设备的当前所处状态
@@ -10,19 +14,47 @@
 
 ### 服务端
 
+#### 为什么需要服务端？
+
+> 本项目初衷就是想编写一个稳定且长期状态页，所以需要一个简洁的访问接口
+
 > 服务端需要设置token，请在根目录下的.env文件中设置复杂度高的token值
 
-```shell
+```javascript
 pnpm i
 pnpm i -g pm2
 pnpm build
 pnpm start
 ```
 
+.env文件配置：
+
+```javascript
+TOKEN=xxxxx
+HOST_ADDR=xxx
+F50_PASSWORD=xxx
+```
+
+### 中兴F50相关
+
+> 没事折腾了一下这个随身WiFi，做状态页顺便做的，稳定性看上去还不错，长期稳定性有待观察。
+
+**短信接口功能：**
+
+```javascript
+//获取短信
+get('/sms')
+//发送短信
+post('/sms',{content,number})
+//删除短信
+delete('/sms/:id')
+```
+
 ### 安卓脚本
 
-> 不知道，让AI帮忙写的，自己点开文件看看，不保证所有机型兼容
+> 不知道，让AI帮忙写的，自行点开文件看看，不保证所有机型兼容
 > 运行方法：定时任务，或者时候用xposed edge pro 按场景调用脚本
+> 如有问题欢迎提issue
 
 ### 油猴脚本
 
