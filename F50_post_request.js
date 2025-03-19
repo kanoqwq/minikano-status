@@ -3,7 +3,7 @@ function gsmEncode(text) { function encodeText(text) { let encoded = []; for (le
 
 //注意，如果是在f50本机内发起请求，请将请求端口更改为8080
 const baseURL = '192.168.0.1'
-const PASSWORD = '？？'
+const PASSWORD = '？'
 
 //登录
 const common_headers = {
@@ -13,6 +13,9 @@ const common_headers = {
 }
 
 const login = async () => {
+    const { LD } = await getLD()
+    if (!LD) throw new Error('无法获取LD')
+    const pwd = SHA256(SHA256(PASSWORD) + LD)
     const res = await fetch("http://" + baseURL + "/goform/goform_set_cmd_process", {
         method: "POST",
         headers: {
@@ -22,7 +25,7 @@ const login = async () => {
         body: new URLSearchParams({
             "goformId": "LOGIN",
             "isTest": "false",
-            "password": PASSWORD
+            "password": pwd
         })
     })
     return res.headers.get('set-cookie').split(';')[0]
@@ -44,6 +47,17 @@ const logout = async (cookie) => {
     })
     return await res.text()
 }
+
+const getLD = async () => {
+    const res = await fetch("http://" + baseURL + "/goform/goform_get_cmd_process?isTest=false&cmd=LD&_=" + Date.now(), {
+        method: "GET",
+        headers: {
+            ...common_headers,
+        }
+    })
+    return await res.json()
+}
+
 
 const getRD = async (cookie) => {
     if (!cookie) throw new Error('请提供cookie')
@@ -91,7 +105,7 @@ const postData = async (cookie, data = {}) => {
             "AD": AD
         })
     })
-    return await res.text()
+    return res
 }
 const getData = async (data = new URLSearchParams({})) => {
     data.append('isTest', 'false')
@@ -113,15 +127,42 @@ const reboot = async (cookie) => {
     return res
 }
 
-async function main() {
+// 发送短信
+const sendSms = async ({ content, number }) => {
+    if (!content) throw new Error('请提供短信内容')
+    if (!number) throw new Error('请提供手机号')
     const cookie = await login()
-    const message = '你好，这是一条测试消息，来自中兴F50--testabc123'
     const res = await postData(cookie, {
         goformId: 'SEND_SMS',
-        Number: '',
-        MessageBody: gsmEncode(message)
+        Number: number,
+        MessageBody: gsmEncode(content)
     })
-    console.log(res)
     await logout(cookie)
+    return await res.json()
+}
+
+//删除短信
+const removeSmsById = async (id) => {
+    if (!id) throw new Error('请提供短信id')
+    const cookie = await login()
+    const res = await postData(cookie, {
+        goformId: 'DELETE_SMS',
+        msg_id: id,
+        notCallback: true
+    })
+    await logout(cookie)
+    return await res.json()
+}
+
+
+//短信tag：0-已读，1-未读，2-发送
+
+async function main() {
+    // const res = await sendSms({
+    //     content: '？？',
+    //     number: '？？'
+    // })
+    const res = await removeSmsById('11')
+    console.log(res)
 }
 main()

@@ -138,10 +138,12 @@
             border-radius: 10px;
             opacity: 1;
             transition: all .3s;
+            /* background-color: #00ffdd17; */
+            box-shadow: 0 0 10px 0 #00ffdd96;
         }
 
         .modal button {
-            padding: 2px 8px;
+            padding: 5px 10px;
             background-color: skyblue;
             border: 1px solid transparent;
             border-radius: 5px;
@@ -164,23 +166,49 @@
 
         .modal .content {
             overflow: auto;
+            overflow-x: hidden;
             max-height: 300px;
         }
 
+        .modal .action {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            background-color: #00ffdd7c;
+            padding: 5px 6px;
+            border-radius: 6px;
+        }
+
         .sms-item {
+            position: relative;
             max-width: 500px;
-            overflow: auto;
             padding: 10px;
-            margin-top: 5px;
+            margin: 10px;
             border-radius: 10px;
             background: #ffffff70;
             font-size: 14px;
+        }
+
+        .arrow {
+            content: '';
+            position: absolute;
+            display: block;
+            z-index: 111;
+            top: 0;
+            width: 0;
+            height: 0;
+            border: 15px solid;
+            margin: 10px 0;
         }
 
         .sms-item p {
             margin: 0;
             overflow: hidden;
             word-wrap: break-word;
+        }
+
+        ::-webkit-scrollbar {
+            width: 1px;
         }
     </style>
 </head>
@@ -211,14 +239,19 @@
         </div>
     </div>
     <div class="modal" id="smsList" style="display: none;">
-        <div class="title">短信列表</div>
+        <div class="title" style="margin-bottom: 6px;">短信列表</div>
         <div class="content">
             <ul id="sms-list">
             </ul>
         </div>
-        <div class="btn" style="text-align: right;margin-top: 10px;">
-            <button onclick="closeModal('#smsList')">关闭</button>
+        <div class="action" style="background-color: #00ffdd17;box-shadow: 0 0 10px 0 #00ffdd96;">
+            <input type="text" style="flex: 1;margin-right: 6px"></input>
+            <div class="btn">
+                <button onclick="closeModal('#smsList')">发送</button>
+                <button onclick="closeModal('#smsList')">关闭</button>
+            </div>
         </div>
+
     </div>
     <script>
         function decodeBase64(base64String) {
@@ -379,7 +412,8 @@
                     date = date.map((item, index) => {
                         return item + dateStrArr[index]
                     }).join('')
-                    return `<li class="sms-item">
+                    return `<li class="sms-item" style="${item.tag != '2' ? 'background-color:#00800063;margin-left:15px' : 'background-color:#ffc0cb82;margin-right:15px'}">
+                                            <div class="arrow" style="${item.tag == '2' ? 'right:-30px;border-color: transparent transparent transparent #ffc0cb82' : 'left:-30px;border-color: transparent #00800063 transparent transparent'}"></div>
                                             <p style="color:purple;font-size:16px;margin:4px 0">${item.number}</p>
                                             <p>${decodeBase64(item.content)}</p>
                                             <p style="text-align:right;color:purple;margin-top:4px">${date}</p >

@@ -7,7 +7,8 @@ router.post('/status', controller.receiveStatus)
 router.delete('/status/:name', controller.removeStatus)
 
 router.get('/sms', controller.getSMSListOverFrp)
-router.post('/sms', controller.pushSMSList)
+router.post('/sms', controller.sendSMSOverFrp)
+router.delete('/sms/:id', controller.removeSMSById)
 
 
 export default router;
