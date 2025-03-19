@@ -216,6 +216,21 @@
         ::-webkit-scrollbar {
             width: 1px;
         }
+
+        .icon {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            transition: all .3s;
+        }
+
+        .icon:hover {
+            box-shadow: 0 0 10px 0 #ff000096;
+        }
+
+        .icon svg {
+            fill: #ff0000c0;
+        }
     </style>
 </head>
 
@@ -418,6 +433,7 @@
             if (SMSInput && SMSInput.value && SMSInput.value.trim()
                 && PhoneInput && PhoneInput.value && Number(PhoneInput.value.trim())
             ) {
+                if (isDisabledSendSMS) return createToast('请不要频繁发送！', 'red')
                 const content = SMSInput.value.trim()
                 const number = PhoneInput.value.trim()
                 isDisabledSendSMS = true
@@ -444,6 +460,37 @@
                 createToast('请输入手机号和内容', 'red')
             }
         }
+        var deleteSMS = async (id) => {
+            const message = document.querySelector(`#message${id}`)
+            !isNaN(Number(window['deleteSMSConfirmCount' + id])) || (window['deleteSMSConfirmCount' + id] = 0)
+            if (message && !window['isDisabledDeleteSMS' + id]) {
+                message.style.display = 'block'
+                window['deleteSMSConfirmCount' + id] += 1
+                clearTimeout(window['deleteSMSTimer' + id])
+                window['deleteSMSTimer' + id] = setTimeout(() => {
+                    window['deleteSMSConfirmCount' + id] = 0
+                    message.style.display = 'none'
+                    window['isDisabledDeleteSMS' + id] = false
+                }, 2000)
+                if (window['deleteSMSConfirmCount' + id] < 2) return
+                window['isDisabledDeleteSMS' + id] = true
+                const res = await fetch('https://api.kanokano.cn/sms/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        token: localStorage.getItem('kano_sms_token')
+                    },
+                })
+                const res_data = await res.json()
+                if (res_data && res_data.status == 0) {
+                    createToast('删除成功！', 'green')
+                    handleSmsRender()
+                } else {
+                    createToast((res_data && res_data.message) ? res_data.message : '发送失败', 'red')
+                }
+                window['isDisabledDeleteSMS' + id] = false
+            }
+        }
         let handleSmsRender = async () => {
             let list = document.querySelector('#sms-list')
             if (!list) createToast('没有找到短信列表节点', 'red')
@@ -460,6 +507,10 @@
                     }).join('')
                     return `<li class="sms-item" style="${item.tag != '2' ? 'background-color:#00800063;margin-left:15px' : 'background-color:#ffc0cb82;margin-right:15px'}">
                                             <div class="arrow" style="${item.tag == '2' ? 'right:-30px;border-color: transparent transparent transparent #ffc0cb82' : 'left:-30px;border-color: transparent #00800063 transparent transparent'}"></div>
+                                            <div class="icon" onclick="deleteSMS(${item.id})">
+                                                <span id="message${item.id}" style="display:none;color:red;position: absolute;width: 100px;top: 6px;right: 20px;">确定要删除吗？</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1742373390977" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="2837" width="16" height="16"><path d="M848 144H608V96a48 48 0 0 0-48-48h-96a48 48 0 0 0-48 48v48H176a48 48 0 0 0-48 48v48h768v-48a48 48 0 0 0-48-48zM176 928a48 48 0 0 0 48 48h576a48 48 0 0 0 48-48V288H176v640z m480-496a48 48 0 1 1 96 0v400a48 48 0 1 1-96 0V432z m-192 0a48 48 0 1 1 96 0v400a48 48 0 1 1-96 0V432z m-192 0a48 48 0 1 1 96 0v400a48 48 0 1 1-96 0V432z" fill="" p-id="2838"/></svg>
+                                            </div>
                                             <p style="color:purple;font-size:16px;margin:4px 0">${item.number}</p>
                                             <p>${decodeBase64(item.content)}</p>
                                             <p style="text-align:right;color:purple;margin-top:4px">${date}</p >
