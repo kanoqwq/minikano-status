@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Minikano の 状态</title>
+    <title>F50-SMS</title>
     <style>
         body {
             position: relative;
@@ -112,8 +112,8 @@
         }
 
         .footer {
-            margin: 0 auto;
-            margin-bottom: 10px;
+            position: fixed;
+            bottom: 0px;
             text-align: center;
             backdrop-filter: blur(10px);
             border-radius: 10px;
@@ -142,7 +142,7 @@
             box-shadow: 0 0 10px 0 #00ffdd96;
         }
 
-        .modal button {
+        button {
             padding: 5px 10px;
             background-color: skyblue;
             border: 1px solid transparent;
@@ -151,15 +151,15 @@
             transition: box-shadow .2s;
         }
 
-        .modal button:hover {
+        button:hover {
             box-shadow: 0 0 10px 0 skyblue
         }
 
-        .modal button:active {
+        button:active {
             border: 1px solid pink;
         }
 
-        .modal input {
+        input {
             border-radius: 6px;
             border: 1px solid skyblue;
         }
@@ -236,23 +236,18 @@
 
 <body>
     <div class="container">
-        <div class="box" id="kano_box">
-            <h2 class="title">MiniKano の 摸鱼状态？ 🕛</h2>
-            <strong><i>摸鱼才是第一生产力！</i></strong>
-            <p>设备列表：</p>
-            <ul id="deviceList" class="deviceList">
-                <h2 style="color: #333;margin:0">Loading...</h2>
-            </ul>
-        </div>
+        <button id="SMS" class="btn" style="padding: 20px;font-size: 30px;">F50短信收发客户端</button>
     </div>
     <div class="footer">
         <p>This page is created by <a href="https://github.com/kanoqwq">MiniKano</a> with love ❤️</p>
     </div>
     <div class="modal" id="tokenModal" style="display: none;">
         <div class="title">提示</div>
-        <div class="content">
-            <p>请输入请求token：</p>
-            <input id="tokenInput" type="text" style="margin:0 4px;margin-bottom: 20px;height: 30px;">
+        <div class="content" style="padding-top: 15px;display: flex;flex-direction: column;align-items: center;">
+            <input id="IPInput" placeholder="ip地址" value="192.168.0.1" type="text"
+                style="margin:0 4px;margin-bottom: 20px;height: 30px;">
+            <input id="tokenInput" placeholder="管理密码" type="password"
+                style="margin:0 4px;margin-bottom: 20px;height: 30px;">
         </div>
         <div class="btn" style="text-align: right;">
             <button onclick="onTokenConfirm()">确认</button>
@@ -278,6 +273,183 @@
         </div>
 
     </div>
+    <script>
+        function SHA256(e) { function t(e, t) { var n = (65535 & e) + (65535 & t); return (e >> 16) + (t >> 16) + (n >> 16) << 16 | 65535 & n } function n(e, t) { return e >>> t | e << 32 - t } function r(e, t) { return e >>> t } function o(e, t, n) { return e & t ^ ~e & n } function i(e, t, n) { return e & t ^ e & n ^ t & n } function a(e) { return n(e, 2) ^ n(e, 13) ^ n(e, 22) } function s(e) { return n(e, 6) ^ n(e, 11) ^ n(e, 25) } function c(e) { return n(e, 7) ^ n(e, 18) ^ r(e, 3) } function u(e) { return n(e, 17) ^ n(e, 19) ^ r(e, 10) } var l = 8, d = 1; return e = function (e) { e = e.replace(/\\r\\n/g, "\\n"); for (var t = "", n = 0; n < e.length; n++) { var r = e.charCodeAt(n); r < 128 ? t += String.fromCharCode(r) : r > 127 && r < 2048 ? (t += String.fromCharCode(r >> 6 | 192), t += String.fromCharCode(63 & r | 128)) : (t += String.fromCharCode(r >> 12 | 224), t += String.fromCharCode(r >> 6 & 63 | 128), t += String.fromCharCode(63 & r | 128)) } return t }(e), function (e) { for (var t = d ? "0123456789ABCDEF" : "0123456789abcdef", n = "", r = 0; r < 4 * e.length; r++)n += t.charAt(e[r >> 2] >> 8 * (3 - r % 4) + 4 & 15) + t.charAt(e[r >> 2] >> 8 * (3 - r % 4) & 15); return n }(function (e, n) { var r, l, d, p, h, f, m, g, _, b, v, $, S = new Array(1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298), y = new Array(1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225), C = new Array(64); e[n >> 5] |= 128 << 24 - n % 32, e[15 + (n + 64 >> 9 << 4)] = n; for (var _ = 0; _ < e.length; _ += 16) { r = y[0], l = y[1], d = y[2], p = y[3], h = y[4], f = y[5], m = y[6], g = y[7]; for (var b = 0; b < 64; b++)C[b] = b < 16 ? e[b + _] : t(t(t(u(C[b - 2]), C[b - 7]), c(C[b - 15])), C[b - 16]), v = t(t(t(t(g, s(h)), o(h, f, m)), S[b]), C[b]), $ = t(a(r), i(r, l, d)), g = m, m = f, f = h, h = t(p, v), p = d, d = l, l = r, r = t(v, $); y[0] = t(r, y[0]), y[1] = t(l, y[1]), y[2] = t(d, y[2]), y[3] = t(p, y[3]), y[4] = t(h, y[4]), y[5] = t(f, y[5]), y[6] = t(m, y[6]), y[7] = t(g, y[7]) } return y }(function (e) { for (var t = Array(), n = (1 << l) - 1, r = 0; r < e.length * l; r += l)t[r >> 5] |= (e.charCodeAt(r / l) & n) << 24 - r % 32; return t }(e), e.length * l)) }
+        function gsmEncode(text) { function encodeText(text) { let encoded = []; for (let i = 0; i < text.length; i++) { const char = text[i]; const codePoint = char.codePointAt(0); if (codePoint <= 0xFFFF) { encoded.push((codePoint >> 8) & 0xFF); encoded.push(codePoint & 0xFF) } else { const highSurrogate = 0xD800 + ((codePoint - 0x10000) >> 10); const lowSurrogate = 0xDC00 + ((codePoint - 0x10000) & 0x3FF); encoded.push((highSurrogate >> 8) & 0xFF); encoded.push(highSurrogate & 0xFF); encoded.push((lowSurrogate >> 8) & 0xFF); encoded.push(lowSurrogate & 0xFF) } } return encoded } function toHexString(byteArray) { return byteArray.map(byte => byte.toString(16).padStart(2, '0')).join('') } const encodedBytes = encodeText(text); return toHexString(encodedBytes) }
+
+        //注意，如果是在f50本机内发起请求，请将请求端口更改为8080
+        let KANO_baseURL = '192.168.0.1'
+        let KANO_PASSWORD = null
+
+        //登录
+        const common_headers = {
+            "referer": 'http://' + '192.168.0.1' + '/index.html',
+            "host": '192.168.0.1',
+            "user-agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0'
+        }
+
+        const login = async () => {
+            const { LD } = await getLD()
+            if (!LD) throw new Error('无法获取LD')
+            const pwd = SHA256(SHA256(KANO_PASSWORD) + LD)
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_set_cmd_process", {
+                method: "POST",
+                headers: {
+                    ...common_headers,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    "goformId": "LOGIN",
+                    "isTest": "false",
+                    "password": pwd
+                })
+            })
+            return res.headers.get('set-cookie').split(';')[0]
+        }
+
+        const logout = async (cookie) => {
+            const AD = await processAD(cookie)
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_set_cmd_process", {
+                method: "POST",
+                headers: {
+                    ...common_headers,
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                body: new URLSearchParams({
+                    "goformId": "LOGOUT",
+                    "isTest": "false",
+                    AD: AD
+                })
+            })
+            return await res.text()
+        }
+
+        const getLD = async () => {
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_get_cmd_process?isTest=false&cmd=LD&_=" + Date.now(), {
+                method: "GET",
+                headers: {
+                    ...common_headers,
+                }
+            })
+            return await res.json()
+        }
+
+
+        const getRD = async (cookie) => {
+            if (!cookie) throw new Error('请提供cookie')
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_get_cmd_process?isTest=false&cmd=RD&_=" + Date.now(), {
+                method: "GET",
+                headers: {
+                    ...common_headers,
+                    "Cookie": cookie
+                }
+            })
+            return await res.json()
+        }
+
+        const getUFIInfo = async () => {
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_get_cmd_process?isTest=false&cmd=Language,cr_version,wa_inner_version&multi_data=1&_=" + Date.now(), {
+                method: "GET",
+                headers: {
+                    ...common_headers
+                }
+            })
+            return await res.json()
+        }
+
+        const processAD = async (cookie) => {
+            const { wa_inner_version, cr_version } = await getUFIInfo()
+            if (!wa_inner_version || !cr_version) throw new Error('无法获取版本信息')
+            const parsedInfo = SHA256(wa_inner_version + cr_version)
+            const { RD } = await getRD(cookie)
+            const AD = SHA256(parsedInfo + RD)
+            return AD
+        }
+
+        const postData = async (cookie, data = {}) => {
+            const AD = await processAD(cookie)
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_set_cmd_process", {
+                method: "POST",
+                headers: {
+                    ...common_headers,
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "Cookie": cookie
+                },
+                body: new URLSearchParams({
+                    ...data,
+                    isTest: false,
+                    "AD": AD
+                })
+            })
+            return res
+        }
+        const getData = async (data = new URLSearchParams({})) => {
+            data.append('isTest', 'false')
+            data.append('_', Date.now())
+            const res = await fetch("http://" + KANO_baseURL + "/goform/goform_get_cmd_process?" + data.toString(), {
+                method: "GET",
+                headers: {
+                    ...common_headers,
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                },
+            })
+            return await res.json()
+        }
+
+        const reboot = async (cookie) => {
+            const res = await postData(cookie, {
+                goformId: 'REBOOT_DEVICE',
+            })
+            return res
+        }
+
+        // 发送短信
+        const sendSms_UFI = async ({ content, number }) => {
+            if (!content) throw new Error('请提供短信内容')
+            if (!number) throw new Error('请提供手机号')
+            const cookie = await login()
+            const res = await postData(cookie, {
+                goformId: 'SEND_SMS',
+                Number: number,
+                MessageBody: gsmEncode(content)
+            })
+            await logout(cookie)
+            return await res.json()
+        }
+
+        //删除短信
+        const removeSmsById = async (id) => {
+            if (!id) throw new Error('请提供短信id')
+            const cookie = await login()
+            const res = await postData(cookie, {
+                goformId: 'DELETE_SMS',
+                msg_id: id,
+                notCallback: true
+            })
+            await logout(cookie)
+            return await res.json()
+        }
+
+        //获取短信
+        const getUFIData = async () => {
+            try {
+                const params = new URLSearchParams()
+                params.append('_', Date.now().toString())
+                const cmd = 'rssi,Z5g_rsrp,wifi_access_sta_num,loginfo,data_volume_alert_percent,data_volume_limit_size,realtime_rx_thrpt,realtime_tx_thrpt,realtime_time,monthly_tx_bytes,monthly_rx_bytes,monthly_time,network_type,network_provider'
+                const res = await fetch("http://" + KANO_baseURL + "/goform/goform_get_cmd_process?multi_data=1&isTest=false&cmd=" + cmd + "&" + params, {
+                    headers: {
+                        "referer": 'http://192.168.0.11/',
+                        "host": '192.168.0.1'
+                    }
+                })
+
+                return await res.json()
+
+            } catch {
+                return null
+            }
+        }
+    </script>
     <script>
         function decodeBase64(base64String) {
             // 将Base64字符串分成每64个字符一组
@@ -350,26 +522,17 @@
             }, 10)
         }
         function onTokenConfirm() {
+            let IPInput = document.querySelector('#IPInput')
             let tkInput = document.querySelector('#tokenInput')
-            let token = tkInput && (tkInput.value)
-            if (!token || !token?.trim()) return createToast('没有token', 'red')
-            localStorage.setItem('kano_sms_token', token.trim())
+            let password = tkInput && (tkInput.value)
+            let ip = IPInput && (IPInput.value)
+            if (!password || !password?.trim() || !ip || !ip?.trim()) return createToast('请输入ip和密码！', 'red')
+            localStorage.setItem('kano_sms_pwd', password.trim())
+            localStorage.setItem('kano_sms_ip', ip.trim())
             closeModal('#tokenModal')
             handleSmsRender()
         }
-        function kano_getSignalEmoji(strength) {
-            const signals = ["📶 ⬜⬜⬜⬜", "📶 🟨⬜⬜⬜", "📶 🟩🟨⬜⬜", "📶 🟩🟩🟨⬜", "📶 🟩🟩🟩🟨", "📶 🟩🟩🟩🟩"];
-            return signals[Math.max(0, Math.min(strength, 5))]; // 确保输入在 0-5 之间
-        }
-        function kano_formatTime(seconds) {
-            if (seconds < 60) {
-                return `${seconds} 秒`;
-            } else if (seconds < 3600) {
-                return `${(seconds / 60).toFixed(1)} 分钟`;
-            } else {
-                return `${(seconds / 3600).toFixed(1)} 小时`;
-            }
-        }
+
         function requestInterval(callback, interval) {
             let lastTime = 0;
             let timeoutId = null;
@@ -391,42 +554,41 @@
             // 返回清除函数
             return () => cancelAnimationFrame(timeoutId);
         }
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Byte';
 
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(1024));
-            return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
-        }
         var getSms = async () => {
-            const TOKEN = localStorage.getItem('kano_sms_token')
-            if (!TOKEN) {
-                localStorage.removeItem('kano_sms_token')
+            const PWD = localStorage.getItem('kano_sms_pwd')
+            const IP = localStorage.getItem('kano_sms_ip')
+            
+            if (!PWD || !IP) {
+                localStorage.removeItem('kano_sms_pwd')
+                localStorage.removeItem('kano_sms_ip')
                 showModal('#tokenModal')
                 return null
             }
 
+            KANO_PASSWORD =PWD
+            KANO_baseURL = IP
+            
             try {
-                let res = await fetch('https://api.kanokano.cn/sms/', {
-                    headers: {
-                        token: TOKEN
-                    }
-                })
+                let res = await getUFIData()
                 let res_data = await res.json()
 
                 if (res_data && res_data.status !== 0) {
-                    localStorage.removeItem('kano_sms_token')
+                    localStorage.removeItem('kano_sms_pwd')
+                    localStorage.removeItem('kano_sms_ip')
                     showModal('#tokenModal')
                     createToast(res_data.error, 'red')
                     return null
                 }
                 return res_data
             } catch {
-                localStorage.removeItem('kano_sms_token')
+                localStorage.removeItem('kano_sms_pwd')
+                localStorage.removeItem('kano_sms_ip')
                 showModal('#tokenModal')
                 return null
             }
         }
+
         let isDisabledSendSMS = false
         var sendSMS = async () => {
             const SMSInput = document.querySelector('#SMSInput')
@@ -438,16 +600,7 @@
                 const content = SMSInput.value.trim()
                 const number = PhoneInput.value.trim()
                 isDisabledSendSMS = true
-                const res = await fetch('https://api.kanokano.cn/sms/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        token: localStorage.getItem('kano_sms_token')
-                    },
-                    body: JSON.stringify({
-                        content, number
-                    })
-                })
+                const res = await sendSms_UFI({ content, number })
                 const res_data = await res.json()
                 if (res_data && res_data.status == 0) {
                     SMSInput.value = ''
@@ -461,6 +614,7 @@
                 createToast('请输入手机号和内容', 'red')
             }
         }
+
         var deleteSMS = async (id) => {
             const message = document.querySelector(`#message${id}`)
             !isNaN(Number(window['deleteSMSConfirmCount' + id])) || (window['deleteSMSConfirmCount' + id] = 0)
@@ -475,13 +629,7 @@
                 }, 2000)
                 if (window['deleteSMSConfirmCount' + id] < 2) return
                 window['isDisabledDeleteSMS' + id] = true
-                const res = await fetch('https://api.kanokano.cn/sms/' + id, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        token: localStorage.getItem('kano_sms_token')
-                    },
-                })
+                const res = await removeSmsById(id)
                 const res_data = await res.json()
                 if (res_data && res_data.status == 0) {
                     createToast('删除成功！', 'green')
@@ -492,6 +640,7 @@
                 window['isDisabledDeleteSMS' + id] = false
             }
         }
+
         let handleSmsRender = async () => {
             let list = document.querySelector('#sms-list')
             if (!list) createToast('没有找到短信列表节点', 'red')
@@ -518,77 +667,22 @@
                                         </li > `
                 }).join('')
             } else {
-                if (!res) {
-                    closeModal('#smsList'); 
-                    setTimeout(() => {
-                        showModal('#tokenModal');
-                    }, 320); return
-                }
+                if (!res) { return closeModal('#smsList') }
                 list.innerHTML = ` <li> <h2 style="padding: 30px;">没有短信</h2></li >`
                 createToast('没有短信', 'red')
             }
         }
-        var getStatus = () => {
-            fetch('https://api.kanokano.cn/status/')
-                .then((res) => res.json())
-                .then((data) => {
-                    let listEl = document.querySelector('#deviceList')
-                    if (data.status !== 0) {
-                        listEl.innerHTML = `<h3 style="color:#333;margin:0">数据获取失败</h3>`
-                        return
-                    }
 
-                    if (!data.records || !data.records.length) {
-                        listEl.innerHTML = `<h3 style="color:#333;margin:0">没有数据哦~</h3>`
-                        return
-                    }
-                    let html = ``
-                    data.records.forEach((item) => {
-                        let detail = item.detail
-                        html += `<li style="padding-top: 15px;">`
-                        detail ? (html += `<p>
-                            <strong><span class="${item.isOnline ? 'green' : 'red'}">${item.isOnline ? '[在线]&nbsp;' : '[离线]&nbsp;'}</span>${item.name}</strong>
-                            ${((detail.isCharging !== undefined) && (detail.isCharging !== null)) ? `<strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging == true ? detail.chargingText ? detail.chargingText : '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}${detail.batteryCurrent ? ' 电池电流：' + detail.batteryCurrent + 'mA' : ''}${detail.batteryTemperature ? ' 电池温度：' + detail.batteryTemperature + '℃' : ''}</strong>` : ''}
-                            ${((detail.isScreenOn !== undefined) && (detail.isScreenOn !== null)) ? `<strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>` : ''}
-                            ${((detail.wifiStatus !== undefined) && (detail.wifiStatus !== null)) ? `<strong  class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>` : ''}
-                            ${detail.cellularStatus ? `<strong  class="green">蜂窝状态：${detail.cellularStatus}</strong>` : ''}
-
-                            ${detail.F50_data ? (`
-                                ${detail.F50_data.network_type ? `<strong  class="green">蜂窝状态：${detail.F50_data.network_provider} ${detail.F50_data.network_type}</strong>` : ''}
-                                ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue">设备数：${detail.F50_data.wifi_access_sta_num}</strong>` : ''}
-                                ${detail.F50_data.rssi ? `<strong  class="green">蜂窝信号强度：${kano_getSignalEmoji(detail.F50_data.rssi)}</strong>` : ''}
-                                ${detail.F50_data.realtime_time ? `<strong  class="blue">连接时长：${kano_formatTime(Number(detail.F50_data.realtime_time))}${detail.F50_data.monthly_time ? '&nbsp;<span style="color:white">/</span>&nbsp;总时长(月): ' + kano_formatTime(Number(detail.F50_data.monthly_time)) : ''}</strong>` : ''}
-                                ${detail.F50_data.realtime_tx_thrpt != undefined && detail.F50_data.realtime_rx_thrpt != undefined ? `<strong  class="blue">当前网速: ⬇️ ${formatBytes(Number((detail.F50_data.realtime_rx_thrpt)))}/S ⬆️ ${formatBytes(Number((detail.F50_data.realtime_tx_thrpt)))}/S</strong>` : ''}
-                                ${(detail.F50_data.monthly_tx_bytes && detail.F50_data.monthly_rx_bytes) ? `<strong  class="blue">已用流量：<span class="red">${Number((detail.F50_data.monthly_tx_bytes + detail.F50_data.monthly_rx_bytes) / 1024 / 1024 / 1024).toFixed(2)} GB</span>${detail.F50_data.data_volume_limit_size ? '&nbsp;<span style="color:white">/</span>&nbsp;总流量：' + detail.F50_data.data_volume_limit_size.split('_')[0] + ' GB' : ''}</strong>` : ''}
-                                ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue" id="smsBtn" style="border:1px solid skyblue">短信收发</strong>` : ''}
-                            `) : ''}
-                        </p>`) : '';
-                        detail.currentPageTabTitle && (html += `<p><strong class="blue">当前正在看：${detail.currentPageTabTitle}</strong></p>`)
-                        html += `<p style="color:#999;justify-content: end;margin:0 10px 0 0;padding:0;font-size:12px">更新时间：${(new Date(item.lastUpdated)).toLocaleString("zh-CN", {
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                            hour12: false // 24小时制
-                        })}</p > `
-                        html += `</li >`
-                    })
-                    listEl.innerHTML = html
-                    var smsBtn = document.querySelector('#smsBtn')
-                    smsBtn && (smsBtn.onclick = async () => {
-                        if (!localStorage.getItem('kano_sms_token')) {
-                            showModal('#tokenModal')
-                        } else {
-                            handleSmsRender()
-                        }
-                    })
-                });
+        function init() {
+            if (!localStorage.getItem('kano_sms_pwd') && !localStorage.getItem('kano_sms_ip')) {
+                showModal('#tokenModal')
+            } else {
+                handleSmsRender()
+            }
         }
-        getStatus()
-        requestInterval(() => {
-            getStatus()
-        }, 2000)
+        init()
+        var smsBtn = document.querySelector('#SMS')
+        smsBtn.onclick = init
     </script>
 </body>
 
