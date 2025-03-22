@@ -712,7 +712,6 @@
             let res = await getSms()
             if (res && res.length) {
                 const dateStrArr = ['年', '月', '日', ':', ':', '']
-                console.log(res)
                 res.sort((a,b)=>{
                     let date_a = a.date.split(',')
                     let date_b = b.date.split(',')
@@ -720,7 +719,6 @@
                     date_b.pop()
                     return Number(date_b.join('')) - Number(date_a.join(''))
                 })
-                console.log(res)
                 list.innerHTML = res.map(item => {
                     let date = item.date.split(',')
                     date.pop()
