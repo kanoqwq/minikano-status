@@ -342,6 +342,7 @@
             }, delay);
         }
         function closeModal(txt, time = 300) {
+            if (txt == '#smsList') smsSender && smsSender()
             let el = document.querySelector(txt)
             if (!el) return
             el.style.opacity = 0
@@ -358,13 +359,25 @@
                 el.style.opacity = 1
             }, 10)
         }
+        let timer_out = null
+        function out() {
+            smsSender && smsSender()
+            localStorage.removeItem('kano_sms_token')
+            closeModal('#smsList')
+            clearTimeout(timer_out)
+            timer_out = setTimeout(() => {
+                showModal('#tokenModal')
+            }, 320);
+        }
         function onTokenConfirm() {
             let tkInput = document.querySelector('#tokenInput')
             let token = tkInput && (tkInput.value)
             if (!token || !token?.trim()) return createToast('没有token', 'red')
             localStorage.setItem('kano_sms_token', token.trim())
             closeModal('#tokenModal')
+            smsSender && smsSender()
             handleSmsRender()
+            smsSender = requestInterval(handleSmsRender, 2000)
         }
         function kano_getSignalEmoji(strength) {
             const signals = ["📶 ⬜⬜⬜⬜", "📶 🟨⬜⬜⬜", "📶 🟩🟨⬜⬜", "📶 🟩🟩🟨⬜", "📶 🟩🟩🟩🟨", "📶 🟩🟩🟩🟩"];
@@ -410,8 +423,7 @@
         var getSms = async () => {
             const TOKEN = localStorage.getItem('kano_sms_token')
             if (!TOKEN) {
-                localStorage.removeItem('kano_sms_token')
-                showModal('#tokenModal')
+                out()
                 return null
             }
 
@@ -424,15 +436,13 @@
                 let res_data = await res.json()
 
                 if (res_data && res_data.status !== 0) {
-                    localStorage.removeItem('kano_sms_token')
-                    showModal('#tokenModal')
+                    out()
                     createToast(res_data.error, 'red')
                     return null
                 }
                 return res_data
             } catch {
-                localStorage.removeItem('kano_sms_token')
-                showModal('#tokenModal')
+                out()
                 return null
             }
         }
@@ -443,27 +453,32 @@
             if (SMSInput && SMSInput.value && SMSInput.value.trim()
                 && PhoneInput && PhoneInput.value && Number(PhoneInput.value.trim())
             ) {
-                if (isDisabledSendSMS) return createToast('请不要频繁发送！', 'red')
-                const content = SMSInput.value.trim()
-                const number = PhoneInput.value.trim()
-                isDisabledSendSMS = true
-                const res = await fetch('https://api.kanokano.cn/sms/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        token: localStorage.getItem('kano_sms_token')
-                    },
-                    body: JSON.stringify({
-                        content, number
+                try {
+                    if (isDisabledSendSMS) return createToast('请不要频繁发送！', 'red')
+                    const content = SMSInput.value.trim()
+                    const number = PhoneInput.value.trim()
+                    isDisabledSendSMS = true
+                    const res = await fetch('https://api.kanokano.cn/sms/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            token: localStorage.getItem('kano_sms_token')
+                        },
+                        body: JSON.stringify({
+                            content, number
+                        })
                     })
-                })
-                const res_data = await res.json()
-                if (res_data && res_data.status == 0) {
-                    SMSInput.value = ''
-                    createToast('发送成功！', 'green')
-                    handleSmsRender()
-                } else {
-                    createToast((res_data && res_data.message) ? res_data.message : '发送失败', 'red')
+                    const res_data = await res.json()
+                    if (res_data && res_data.status == 0) {
+                        SMSInput.value = ''
+                        createToast('发送成功！', 'green')
+                        handleSmsRender()
+                    } else {
+                        createToast((res_data && res_data.message) ? res_data.message : '发送失败', 'red')
+                    }
+                } catch {
+                    createToast('发送失败，请检查网络和token', 'red')
+                    out()
                 }
                 isDisabledSendSMS = false
             } else {
@@ -501,15 +516,19 @@
                 window['isDisabledDeleteSMS' + id] = false
             }
         }
+        let isFirstRender = true
         let handleSmsRender = async () => {
             let list = document.querySelector('#sms-list')
             if (!list) createToast('没有找到短信列表节点', 'red')
-            list.innerHTML = ` <li><h2 style="padding: 30px;text-align:center">Loading...</h2></li>`
+            if (isFirstRender) {
+                list.innerHTML = ` <li><h2 style="padding: 30px;text-align:center">Loading...</h2></li>`
+            }
+            isFirstRender = false
             showModal('#smsList')
             let res = await getSms()
             if (res && res.records) {
                 const dateStrArr = ['年', '月', '日', ':', ':', '']
-                res.records.sort((a,b)=>{
+                res.records.sort((a, b) => {
                     let date_a = a.date.split(',')
                     let date_b = b.date.split(',')
                     date_a.pop()
@@ -535,10 +554,7 @@
                 }).join('')
             } else {
                 if (!res) {
-                    closeModal('#smsList'); 
-                    setTimeout(() => {
-                        showModal('#tokenModal');
-                    }, 320); return
+                    out()
                 }
                 list.innerHTML = ` <li> <h2 style="padding: 30px;text-align:center">没有短信</h2></li >`
                 createToast('没有短信', 'red')
@@ -593,14 +609,18 @@
                     listEl.innerHTML = html
                     var smsBtn = document.querySelector('#smsBtn')
                     smsBtn && (smsBtn.onclick = async () => {
+                        smsSender && smsSender()
                         if (!localStorage.getItem('kano_sms_token')) {
                             showModal('#tokenModal')
                         } else {
                             handleSmsRender()
+                            smsSender = requestInterval(() => handleSmsRender(), 2000)
+
                         }
                     })
                 });
         }
+        let smsSender = null
         getStatus()
         requestInterval(() => {
             getStatus()

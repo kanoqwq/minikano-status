@@ -744,7 +744,7 @@
             }
         }
 
-        smsSender = null
+        let smsSender = null
         function init() {
             smsSender && smsSender()
             if (!localStorage.getItem('kano_sms_pwd') && !localStorage.getItem('kano_sms_ip')) {
