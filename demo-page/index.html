@@ -127,6 +127,7 @@
         }
 
         .modal {
+            box-sizing: border-box;
             position: fixed;
             overflow: hidden;
             top: 50%;
@@ -173,7 +174,9 @@
         .modal .action {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
             background-color: #00ffdd7c;
             padding: 5px 6px;
             border-radius: 6px;
@@ -230,6 +233,11 @@
 
         .icon svg {
             fill: #ff0000c0;
+        }
+
+        #smsList {
+            width: 94%;
+            max-width: 600px;
         }
     </style>
 </head>
@@ -524,7 +532,7 @@
                         showModal('#tokenModal');
                     }, 320); return
                 }
-                list.innerHTML = ` <li> <h2 style="padding: 30px;">没有短信</h2></li >`
+                list.innerHTML = ` <li> <h2 style="padding: 30px;text-align:center">没有短信</h2></li >`
                 createToast('没有短信', 'red')
             }
         }
