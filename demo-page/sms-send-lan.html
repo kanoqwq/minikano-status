@@ -701,6 +701,7 @@
         };
 
         let isFirstRender = true
+        let lastRequestSmsIds = null
         let handleSmsRender = async () => {
             let list = document.querySelector('#sms-list')
             if (!list) createToast('没有找到短信列表节点', 'red')
@@ -711,6 +712,10 @@
             showModal('#smsList')
             let res = await getSms()
             if (res && res.length) {
+                //防止重复渲染
+                let ids = res.map(item => item.id).join('')
+                if (ids === lastRequestSmsIds) return
+                lastRequestSmsIds = ids
                 const dateStrArr = ['年', '月', '日', ':', ':', '']
                 res.sort((a,b)=>{
                     let date_a = a.date.split(',')
