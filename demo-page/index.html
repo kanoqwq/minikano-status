@@ -565,6 +565,7 @@
                 createToast('没有短信', 'red')
             }
         }
+        let lastRequestStatus = null
         var getStatus = () => {
             fetch('https://api.kanokano.cn/status/')
                 .then((res) => res.json())
@@ -579,6 +580,10 @@
                         listEl.innerHTML = `<h3 style="color:#333;margin:0">没有数据哦~</h3>`
                         return
                     }
+                    //防止重复渲染
+                    let jsons = JSON.stringify(data.records)
+                    if (jsons === lastRequestStatus) return
+                    lastRequestStatus = jsons
                     let html = ``
                     data.records.forEach((item) => {
                         let detail = item.detail
