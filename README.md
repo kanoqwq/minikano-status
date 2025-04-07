@@ -1,17 +1,6 @@
-## 关于中兴F50的短信收发功能
-
->如果想做单独的短信收发功能，请使用`demopage/sms-send.html` 并配置好后端服务
->
->问：如何让f50通过外部服务器连接？ 答：在f50内安装frp软件并设为开机自启
->启用ADB安装软件教程：https://www.coolapk.com/feed/62323332?shareKey=NTJlYmQ0ODI0NDg1NjdkYWIxYmI~&shareUid=807133&shareFrom=com.coolapk.market_15.1.1
-
-![](./img/1.png)
-
-![](./img/2.png)
-
 ## 功能
 
->查看本人所使用的设备的当前所处状态
+> 展示设备的状态和运行状态
 
 ## 灵感
 
@@ -40,21 +29,6 @@ pnpm start
 TOKEN=xxxxx
 HOST_ADDR=xxx
 F50_PASSWORD=xxx
-```
-
-### 中兴F50相关
-
-> 没事折腾了一下这个随身WiFi，做状态页顺便做的，稳定性看上去还不错，长期稳定性有待观察。
-
-**短信接口功能：**
-
-```javascript
-//获取短信
-get('/sms')
-//发送短信
-post('/sms',{content,number})
-//删除短信
-delete('/sms/:id')
 ```
 
 ### 安卓脚本
