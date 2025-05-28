@@ -14,6 +14,7 @@
             background-image: url('https://api.kanokano.cn/startThere/assets/bg.webp');
             background-attachment: fixed;
             background-size: cover;
+            font-size: 14px;
         }
 
         ul {
@@ -48,11 +49,11 @@
         }
 
         .deviceList li {
+            list-style: none;
             border-radius: 10px;
             background-color: #ffffff70;
-            /* backdrop-filter: blur(10px); */
             padding: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .deviceList li p {
@@ -60,7 +61,7 @@
             flex-wrap: wrap;
             overflow: auto;
             margin: 0;
-            padding: 10px 0;
+            padding: 0px 0;
             padding-bottom: 5px;
             border-radius: 10px;
         }
@@ -594,7 +595,7 @@
                             ${((detail.isScreenOn !== undefined) && (detail.isScreenOn !== null)) ? `<strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>` : ''}
                             ${((detail.wifiStatus !== undefined) && (detail.wifiStatus !== null)) ? `<strong  class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>` : ''}
                             ${detail.cellularStatus ? `<strong  class="green">蜂窝状态：${detail.cellularStatus}</strong>` : ''}
-
+                            ${(detail.music) ? `<strong>${detail.music}</strong>` : ''}
                             ${detail.F50_data ? (`
                                 ${detail.F50_data.network_type ? `<strong  class="green">蜂窝状态：${detail.F50_data.network_provider} ${detail.F50_data.network_type}</strong>` : ''}
                                 ${detail.F50_data.wifi_access_sta_num ? `<strong  class="blue">设备数：${detail.F50_data.wifi_access_sta_num}</strong>` : ''}

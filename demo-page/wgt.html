@@ -163,6 +163,7 @@
                             ${((detail.isCharging !== undefined) && (detail.isCharging !== null)) ? `<strong  class="${detail.isCharging ? 'green' : 'red'}">${detail.isCharging == true ? detail.chargingText ? detail.chargingText : '充电中⚡' : '未在充电'} ${detail.battery ? '电量：' + detail.battery + '% 🔋' : ''}${detail.batteryCurrent ? ' 电池电流：' + detail.batteryCurrent + 'mA' : ''}${detail.batteryTemperature ? ' 电池温度：' + detail.batteryTemperature + '℃' : ''}</strong>` : ''}
                             ${((detail.isScreenOn !== undefined) && (detail.isScreenOn !== null)) ? `<strong  class="${detail.isScreenOn ? 'blue' : 'red'}">${detail.isScreenOn ? '亮屏中' : '关屏休息中'}</strong>` : ''}
                             ${((detail.wifiStatus !== undefined) && (detail.wifiStatus !== null)) ? `<strong  class="${detail.wifiStatus == 'connected' ? 'green' : 'red'}">${detail.wifiStatus == 'connected' ? '已连接WiFi' : '未连接WiFi'}</strong>` : ''}
+                            ${(detail.music) ? `<strong>${detail.music}</strong>` : ''}
                             ${detail.cellularStatus ? `<strong  class="green">蜂窝状态：${detail.cellularStatus}</strong>` : ''}
 
                             ${detail.F50_data ? (`
